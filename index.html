@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿C吧 (AI-Connect-Bar) - 拯救你的表达欲</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --text-main: #ffffff;
+            --text-sub: #a1a1aa;
+            --accent-primary: #8b5cf6;
+            /* Violet */
+            --accent-secondary: #06b6d4;
+            /* Cyan */
+            --glass-bg: rgba(20, 20, 20, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --card-radius: 24px;
+            --font-main: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            margin: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --------------------------
+           BACKGROUND AMBIENCE
+           -------------------------- */
+        .ambient-aurora {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            background: radial-gradient(circle, var(--color), transparent 60%);
+            opacity: 0.15;
+            filter: blur(80px);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .b1 {
+            top: -20%;
+            left: -20%;
+            width: 50vw;
+            height: 50vw;
+            background: var(--accent-primary);
+            animation-delay: 0s;
+        }
+
+        .b2 {
+            bottom: -20%;
+            right: -20%;
+            width: 60vw;
+            height: 60vw;
+            background: var(--accent-secondary);
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(10%, 10%) scale(1.1);
+            }
+        }
+
+        /* --------------------------
+           LAYOUT
+           -------------------------- */
+        .page-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 48px);
+            max-width: 1000px;
+            height: 64px;
+            background: rgba(30, 30, 30, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px 0 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .brand {
+            font-weight: 900;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .download-btn {
+            background: #fff;
+            color: #000;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+        }
+
+        /* --------------------------
+           HERO
+           -------------------------- */
+        .hero {
+            padding-top: 180px;
+            padding-bottom: 120px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 32px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .hero h1 {
+            font-size: 80px;
+            line-height: 1.05;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-sub);
+            max-width: 600px;
+            margin: 0 auto 60px;
+            line-height: 1.6;
+        }
+
+        /* Typewriter Showcase */
+        .typer-window {
+            width: 100%;
+            max-width: 800px;
+            height: 240px;
+            margin: 0 auto;
+            background: #111;
+            border-radius: 16px;
+            border: 1px solid #333;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .win-bar {
+            height: 40px;
+            border-bottom: 1px solid #222;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .dot.r {
+            background: #ef4444;
+        }
+
+        .dot.y {
+            background: #f59e0b;
+        }
+
+        .dot.g {
+            background: #10b981;
+        }
+
+        .win-content {
+            flex: 1;
+            padding: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            /* Code font looks techy */
+            font-size: 22px;
+            color: #ccc;
+            text-align: left;
+            position: relative;
+        }
+
+        .cursor {
+            width: 10px;
+            height: 24px;
+            background: var(--accent-primary);
+            display: inline-block;
+            vertical-align: middle;
+            animation: blink 1s infinite;
+        }
+
+        .role-tag {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: var(--accent-primary);
+            background: rgba(139, 92, 246, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 0.3s;
+        }
+
+        .role-tag.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --------------------------
+           FEATURES GRID (Bento)
+           -------------------------- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 120px;
+        }
+
+        .bento-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .bento-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .card-desc {
+            font-size: 16px;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        /* Feature 1 Demo: Input Polish */
+        .polish-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .msg-bubble {
+            padding: 16px 20px;
+            border-radius: 12px;
+            max-width: 80%;
+            font-size: 15px;
+        }
+
+        .msg-raw {
+            align-self: flex-start;
+            background: #27272a;
+            color: #a1a1aa;
+            border-radius: 12px 12px 12px 2px;
+        }
+
+        .msg-polish {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+            color: #fff;
+            border-radius: 12px 12px 2px 12px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Feature 2 Demo: Persona Grid */
+        .persona-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .p-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid transparent;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .p-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .p-btn.active {
+            background: #fff;
+            color: #000;
+        }
+
+        .p-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .p-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Feature 3 Demo: Deep Reading */
+        .read-box {
+            background: #fff;
+            color: #111;
+            padding: 24px;
+            border-radius: 12px;
+            font-family: serif;
+            font-size: 18px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .highlight {
+            background: rgba(6, 182, 212, 0.3);
+            border-bottom: 2px solid #06b6d4;
+        }
+
+        .float-panel {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #111;
+            color: #fff;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: var(--font-main);
+            font-size: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 80px 0;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ambient-aurora">
+        <div class="blob b1" style="--color: #4c1d95"></div>
+        <div class="blob b2" style="--color: #0e7490"></div>
+    </div>
+
+    <nav>
+        <div class="brand">
+            <img src="assets/logo.png" alt="Logo">
+            阿C吧
+        </div>
+        <a href="https://github.com/MrCatAI/voice-input-assistant/releases" class="download-btn">免费下载 v0.1.6</a>
+    </nav>
+
+    <div class="page-container">
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-badge">✨ 已支持 Windows & macOS</div>
+            <h1>别喊阿西吧。<br>试试“阿C吧”。</h1>
+            <p>
+                一款“挂”在屏幕边缘的神级 AI 助理。<br>
+                语音输入秒变文案，划词即刻深度解读。
+            </p>
+
+            <div class="typer-window">
+                <div class="win-bar">
+                    <div class="dot r"></div>
+                    <div class="dot y"></div>
+                    <div class="dot g"></div>
+                </div>
+                <div class="win-content">
+                    <span id="typer-text"></span><span class="cursor"></span>
+                    <div class="role-tag" id="role-tag">🎯 已优化语气</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="bento-grid">
+            <!-- Feature 1: Dictation -->
+            <div class="bento-card">
+                <div class="card-title">嘴替模式</div>
+                <div class="card-desc">不用纠结措辞。按住 F2，把你的碎碎念说出来，AI 瞬间整理成“人话”。</div>
+
+                <div class="polish-demo">
+                    <div class="msg-bubble msg-raw">
+                        “那个啥，跟老板说下周二不行，我要去看牙医...”
+                    </div>
+                    <div class="msg-bubble msg-polish">
+                        “尊敬的领导，受个人就医安排（牙医预约）影响，申请将会议调整至下周二之后，望批准。”
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 2: Personas -->
+            <div class="bento-card">
+                <div class="card-title">百变人设</div>
+                <div class="card-desc">内置多种预设。你是需要资深法务的严谨，还是高情商客服的温柔？一键切换。</div>
+
+                <div class="persona-list">
+                    <div class="p-btn active" onmouseover="changePersona(0)">
+                        <span class="p-icon">⚖️</span>
+                        <span class="p-name">资深法务</span>
+                    </div>
+                    <div class="p-btn" onmouseover="changePersona(1)">
+                        <span class="p-icon">🦄</span>
+                        <span class="p-name">多语言</span>
+                    </div>
+                    <div class="p-btn" onmouseover="changePersona(2)">
+                        <span class="p-icon">🔥</span>
+                        <span class="p-name">发疯文学</span>
+                    </div>
+                </div>
+                <div style="margin-top:20px; color:#ddd; font-size:14px; min-height: 40px; border-left:2px solid #555; padding-left:12px;"
+                    id="persona-preview">
+                    “经审查，由于该日期与既定医疗行程冲突，建议变更履约时间...”
+                </div>
+            </div>
+
+            <!-- Feature 3: Reading -->
+            <div class="bento-card full-width">
+                <div class="card-title">划词透视 (Deep Reading)</div>
+                <div class="card-desc">看不懂的英文邮件？太长的技术文档？划选一下，AI 帮你提炼核心，甚至还能用你的声音读给你听。</div>
+
+                <div class="read-box">
+                    <span class="highlight">The concept of Artificial General Intelligence (AGI)</span> represents a
+                    significant leap forward...
+                    <div class="float-panel">
+                        <span>🧠 深度解读中...</span>
+                        <div style="display:flex;gap:2px;align-items:flex-end;height:12px">
+                            <div style="width:2px;height:4px;background:#fff;animation:bounce 0.5s infinite"></div>
+                            <div style="width:2px;height:8px;background:#fff;animation:bounce 0.6s infinite"></div>
+                            <div style="width:2px;height:6px;background:#fff;animation:bounce 0.4s infinite"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <footer>
+            <div style="margin-bottom:20px; font-weight:700; font-size:24px;">AI-Connect-Bar</div>
+            <div>开源 · 隐私安全 · 跨平台</div>
+            <div style="margin-top:40px; font-size:12px; opacity:0.3;">
+                Copyright © 2026 Safphere Community
+            </div>
+        </footer>
+    </div>
+
+    <style>
+        @keyframes bounce {
+
+            0%,
+            100% {
+                height: 4px
+            }
+
+            50% {
+                height: 100%
+            }
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0
+            }
+        }
+    </style>
+
+    <script>
+        // Hero Typing Effect
+        const typeText = document.getElementById('typer-text');
+        const roleTag = document.getElementById('role-tag');
+        const textSequence = [
+            { t: "那个啥，方案能不能再缓两天？", mode: "raw" },
+            { t: "尊敬的客户，为确保方案品质，我们建议将交付节点顺延两日...", mode: "polish" }
+        ];
+
+        let seqStep = 0;
+        let charIdx = 0;
+        let isDel = false;
+
+        function typeLoop() {
+            const current = textSequence[seqStep % 2];
+            const txt = current.t;
+
+            if (!isDel) {
+                // Typing
+                typeText.innerText = txt.substring(0, charIdx + 1);
+                charIdx++;
+
+                if (charIdx === txt.length) {
+                    if (current.mode === 'raw') {
+                        setTimeout(() => { isDel = true; roleTag.classList.add('show'); }, 800);
+                    } else {
+                        setTimeout(() => { isDel = true; roleTag.classList.remove('show'); }, 3000);
+                    }
+                }
+            } else {
+                // Deleting
+                typeText.innerText = txt.substring(0, charIdx - 1);
+                charIdx--;
+
+                if (charIdx === 0) {
+                    isDel = false;
+                    seqStep++;
+                }
+            }
+
+            let speed = isDel ? 20 : (current.mode === 'polish' ? 30 : 80);
+            setTimeout(typeLoop, speed);
+        }
+        typeLoop();
+
+        // Persona Switcher
+        const pTexts = [
+            "“经审查，由于该日期与既定医疗行程冲突，建议变更履约时间...”", // 法务
+            "“Due to a scheduled medical appointment, I kindly request to reschedule...”", // 翻译
+            "“看牙！看牙！疼死了！下周二开个鬼的会啊！改期！”" // 发疯
+        ];
+        function changePersona(idx) {
+            document.querySelectorAll('.p-btn').forEach((b, i) => {
+                if (i === idx) b.classList.add('active');
+                else b.classList.remove('active');
+            });
+            document.getElementById('persona-preview').innerText = pTexts[idx];
+        }
+    </script>
+</body>
+
+</html>
